@@ -141,7 +141,7 @@ spec:RegisterTalents( {
     -- Dark Ranger
     banshees_mark             = { 11111, 467902, 1 }, -- 
     black_arrow               = { 94987, 466932, 1, "dark_ranger" }, -- Fire a Black Arrow into your target, dealing 30,024 Shadow damage over 18 sec. Each time Black Arrow deals damage, you have a 10% chance to generate a charge of Aimed Shot and reduce its cast time by 50%.    
-    bleak_arrows              = { 11111, 467749, 1 }, -- Your auto shot now deals Shadow damage, allowing it to bypass armor. Your auto shot has a 8% chance to grant Deathblow.
+    bleak_arrows              = { 11111, 467749, 1 }, -- Your auto shot now deals Shadow damage, allowing it to bypass armor. Your auto shot has a 20% chance to grant Deathblow.
     bleak_powder              = { 11111, 467911, 1 }, -- 
     dark_chains               = { 94960, 430712, 1 }, -- Disengage will chain the closest target to the ground, causing them to move 40% slower until they move 8 yards away.
     embrace_the_shadows       = { 94959, 430704, 1 }, -- You heal for 15% of all Shadow damage dealt by you or your pets.
@@ -1028,8 +1028,9 @@ spec:RegisterAbilities( {
         talent = "black_arrow",
         startsCombat = true,
 
-        usable = function () return buff.deathblow.up or buff.hunters_prey.up or buff.flayers_mark.up or ( talent.the_bell_tolls.enabled and target.health_pct > 80 ) or target.health_pct < 20, "requires flayers_mark/hunters_prey or target health below 20 percent or above 80 percent" end,
+        usable = function () return buff.deathblow.up or buff.flayers_mark.up or ( talent.the_bell_tolls.enabled and target.health_pct > 80 ) or target.health_pct < 20, "requires flayers_mark or target health below 20 percent or above 80 percent" end,
         handler = function ()
+            applyDebuff( "target", "black_arrow" )
             removeBuff( "deathblow" )
             removeBuff( "flayers_mark" )
 
@@ -1196,9 +1197,7 @@ spec:RegisterAbilities( {
     kill_shot = {
         id = 53351,
         cast = 0,
-        charges = function() return talent.deadeye.enabled and 2 or nil end,
         cooldown = 10,
-        recharge = function() return talent.deadeye.enabled and 7 or nil end,
         gcd = "spell",
         school = "physical",
 
@@ -1208,7 +1207,7 @@ spec:RegisterAbilities( {
         talent = "kill_shot",
         startsCombat = true,
 
-        usable = function () return buff.deathblow.up or buff.flayers_mark.up or target.health_pct < 20, "requires flayers_mark/hunters_prey or target health below 20 percent" end,
+        usable = function () return buff.deathblow.up or buff.flayers_mark.up or target.health_pct < 20, "requires flayers_mark or target health below 20 percent" end,
         handler = function ()
             removeBuff( "deathblow" )
             removeBuff( "flayers_mark" )
