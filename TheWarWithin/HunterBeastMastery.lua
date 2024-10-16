@@ -269,20 +269,21 @@ spec:RegisterTalents( {
     wild_attacks            = { 94962, 445708, 1 }, -- Every third pet Basic Attack is a guaranteed critical strike, with damage further increased by critical strike chance.
 
     -- Dark Ranger
-    black_arrow             = { 94987, 430703, 1, "dark_ranger" }, -- Fire a Black Arrow into your target, dealing 21,938 Shadow damage over 18 sec. Each time Black Arrow deals damage, you have a 10% chance to generate a charge of Barbed Shot.
-    dark_chains             = { 94960, 430712, 1 }, -- Disengage will chain the closest target to the ground, causing them to move 40% slower until they move 8 yards away.
-    dark_empowerment        = { 94986, 430718, 1 }, -- When Black Arrow resets the cooldown of an ability, gain 15 Focus.
-    darkness_calls          = { 94974, 430722, 1 }, -- All Shadow damage you and your pets deal is increased by 10%.
-    death_shade             = { 94968, 430711, 1 }, -- When you apply Black Arrow to a target, you gain the Hunter's Prey effect.
-    embrace_the_shadows     = { 94959, 430704, 1 }, -- You heal for 15% of all Shadow damage dealt by you or your pets.
-    grave_reaper            = { 94986, 430719, 1 }, -- When a target affected by Black Arrow dies, the cooldown of Black Arrow is reduced by 12 sec.
-    overshadow              = { 94961, 430716, 1 }, -- Barbed Shot and Kill Command deal 15% increased damage.
-    shadow_erasure          = { 94974, 430720, 1 }, -- Kill Shot has a 15% chance to generate a charge of Barbed Shot when used on a target affected by Black Arrow.
-    shadow_hounds           = { 94983, 430707, 1 }, -- Each time Black Arrow deals damage, you have a 10% chance to manifest a Dark Hound to charge to your target and deal Shadow damage.
-    shadow_lash             = { 94957, 430717, 1 }, -- When Call of the Wild is active, Black Arrow deals damage 50% faster.
-    shadow_surge            = { 94982, 430714, 1 }, -- When Multi-Shot hits a target affected by Black Arrow, a burst of Shadow energy erupts, dealing moderate Shadow damage to all enemies near the target. This can only occur once every 6 sec.
-    smoke_screen            = { 94959, 430709, 1 }, -- Exhilaration grants you 3 sec of Survival of the Fittest. Survival of the Fittest activates Exhilaration at 50% effectiveness.
-    withering_fire          = { 94993, 430715, 1 }, -- When Black Arrow resets the cooldown of Barbed Shot, a barrage of dark arrows will strike your target for Shadow damage and increase the damage you and your pets deal by 10% for 6 sec.
+    banshees_mark             = { 11111, 467902, 1 }, -- 
+    black_arrow               = { 94987, 466932, 1, "dark_ranger" }, -- Fire a Black Arrow into your target, dealing 30,024 Shadow damage over 18 sec. Each time Black Arrow deals damage, you have a 10% chance to generate a charge of Aimed Shot and reduce its cast time by 50%.    
+    bleak_arrows              = { 11111, 467749, 1 }, -- Your auto shot now deals Shadow damage, allowing it to bypass armor. Your auto shot has a 20% chance to grant Deathblow.
+    bleak_powder              = { 11111, 467911, 1 }, -- 
+    dark_chains               = { 94960, 430712, 1 }, -- Disengage will chain the closest target to the ground, causing them to move 40% slower until they move 8 yards away.
+    embrace_the_shadows       = { 94959, 430704, 1 }, -- You heal for 15% of all Shadow damage dealt by you or your pets.
+    ebon_bowstring            = { 11111, 467897, 1 }, -- 
+    phantom_pain              = { 11111, 467941, 1 }, -- 
+    shadow_dagger             = { 11111, 467741, 1 }, -- 
+    shadow_hounds             = { 94983, 430707, 1 }, -- Each time Black Arrow deals damage, you have a 10% chance to manifest a Dark Hound to charge to your target and deal Shadow damage.
+    shadow_surge              = { 94982, 467936, 1 }, -- 
+    soul_drinker              = { 11111, 469638, 1 }, -- When an enemy affected by Black Arrow dies, you have a 10% chance to gain Deathblow.
+    smoke_screen              = { 94959, 430709, 1 }, -- Exhilaration grants you 3 sec of Survival of the Fittest. Survival of the Fittest activates Exhilaration at 50% effectiveness.
+    the_bell_tolls            = { 11111, 467644, 1 }, -- Black Arrow is now usable on enemies with greater than 80% health or less than 20% health.
+    withering_fire            = { 94993, 466990, 1 }, -- 
 } )
 
 
@@ -600,6 +601,12 @@ spec:RegisterAuras( {
         duration = 6.0,
         tick_time = 2.0,
         max_stack = 1,
+    },
+
+    deathblow = {
+        id = 378770,
+        duration = 12,
+        max_stack = 1
     },
     -- Talent: Taking $w2% increased Physical damage from $@auracaster.
     -- https://wowhead.com/beta/spell=325037
@@ -1120,6 +1127,19 @@ spec:RegisterAuras( {
         max_stack = 1
     },
 
+    withering_fire_counter = {
+        id = 468074,
+        duration = 180,
+        max_stack = 2
+    },
+
+    withering_fire = {
+        id = 466991,
+        duration = 12,
+        max_stack = 1
+
+    },
+
     -- PvP Talents
     high_explosive_trap = {
         id = 236777,
@@ -1447,7 +1467,17 @@ spec:RegisterAbilities( {
 
         handler = function ()
             applyBuff( "bestial_wrath" )
-            if talent.scent_of_blood.enabled then gainCharges( "barbed_shot", 2 ) end
+            if talent.withering_fire.enabled then
+                if buff.withering_fire_counter.stacks < 2 then
+                    addStack( "withering_fire_counter" )
+                else
+                    removeBuff ( "withering_fire_counter" )
+                    applyBuff ( "withering_fire" )
+                end
+            end
+
+            if talent.scent_of_blood.enabled then 
+                gainCharges( "barbed_shot", talent.scent_of_blood.rank ) end
             if set_bonus.tier31_2pc > 0 then
                 applyBuff( "dire_beast", 15 )
                 summonPet( "dire_beast", 15 )
@@ -1473,10 +1503,11 @@ spec:RegisterAbilities( {
     },
 
     -- Fire a Black Arrow into your target, dealing $o1 Shadow damage over $d.; Each time Black Arrow deals damage, you have a $s2% chance to generate a charge of $?a137015[Barbed Shot]?a137016[Aimed Shot and reduce its cast time by $439659s2%][Barbed Shot or Aimed Shot].
+    -- Fire a Black Arrow into your target, dealing $o1 Shadow damage over $d.; Each time Black Arrow deals damage, you have a $s2% chance to generate a charge of $?a137015[Barbed Shot]?a137016[Aimed Shot and reduce its cast time by $439659s2%][Barbed Shot or Aimed Shot].
     black_arrow = {
-        id = 430703,
+        id = 466930,
         cast = 0.0,
-        cooldown = 30.0,
+        cooldown = 10.0,
         gcd = "spell",
 
         spend = 10,
@@ -1485,10 +1516,16 @@ spec:RegisterAbilities( {
         talent = "black_arrow",
         startsCombat = true,
 
-        handler = function()
-            applyDebuff( "target", "black_arrow" )
-            if talent.death_shade.enabled then applyBuff ( "hunters_prey" ) end
-        end,
+        usable = function () return buff.deathblow.up or buff.flayers_mark.up or ( talent.the_bell_tolls.enabled and target.health_pct > 80 ) or target.health_pct < 20, "requires flayers_mark/hunters_prey or target health below 20 percent or above 80 percent" end,
+        handler = function ()
+            removeBuff( "deathblow" )
+            removeBuff( "flayers_mark" )
+
+            if buff.flayers_mark.up and legendary.pouch_of_razor_fragments.enabled then
+                applyDebuff( "target", "pouch_of_razor_fragments" )
+            end
+
+        end
     },
 
     -- Command your pet to tear into your target, causing your target to bleed for $<damage> over $321538d and take $321538s2% increased damage from your pet by for $321538d.
@@ -2008,28 +2045,26 @@ spec:RegisterAbilities( {
 
     -- Talent: You attempt to finish off a wounded target, dealing $s1 Physical damage. Only usable on enemies with less than $s2% health.$?s343248[    Kill Shot deals $343248s1% increased critical damage.][]
     kill_shot = {
-        id = function() return state.spec.survival and 320976 or 53351 end,
+        id = 53351,
         cast = 0,
-        charges = function() return talent.deadeye.enabled and 2 or nil end,
-        cooldown = function() return talent.deadeye.enabled and 7 or 10 end,
-        recharge = function() return talent.deadeye.enabled and 7 or nil end,
+        cooldown = 10,
         gcd = "spell",
         school = "physical",
 
-        spend = function () return ( buff.hunters_prey.up or buff.flayers_mark.up ) and 0 or 10 end,
+        spend = function () return ( buff.flayers_mark.up ) and 0 or 10 end,
         spendType = "focus",
 
         talent = "kill_shot",
         startsCombat = true,
 
-        usable = function () return buff.hunters_prey.up or buff.flayers_mark.up or target.health_pct < 20, "requires flayers_mark/hunters_prey or target health below 20 percent" end,
+        usable = function () return buff.flayers_mark.up or buff.deathblow.up ( talent.the_bell_tolls.enabled and target.health_pct > 80 ) or target.health_pct < 20, "requires flayers_mark or target health below 20 percent" end,
         handler = function ()
             if buff.flayers_mark.up and legendary.pouch_of_razor_fragments.enabled then
                 applyDebuff( "target", "pouch_of_razor_fragments" )
                 removeBuff( "flayers_mark" )
-            else
-                removeBuff( "hunters_prey" )
             end
+            if talent.venoms_bite.enabled then applyDebuff( "target", "serpent_sting" ) end
+            removeBuff( "deathblow" )
         end,
 
         copy = { 53351, 320976 }
