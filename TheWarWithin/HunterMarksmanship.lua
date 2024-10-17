@@ -1,5 +1,7 @@
 -- HunterMarksmanship.lua
--- October 2024 big updates for 11.0.5
+-- July 2024
+
+-- TOPDO: Lunar Storm ICD
 
 if UnitClassBase( "player" ) ~= "HUNTER" then return end
 
