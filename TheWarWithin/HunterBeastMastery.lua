@@ -1,5 +1,5 @@
 -- HunterBeastMastery.lua
--- October 2024 big updates for 11.0.5
+-- July 2024
 
 if UnitClassBase( "player" ) ~= "HUNTER" then return end
 
@@ -2296,6 +2296,8 @@ spec:RegisterAbilities( {
     steady_shot = {
         id = 56641,
         cast = 1.7,
+        spend = -10,
+        spendType = "focus",
         cooldown = 0.0,
         gcd = "spell",
 
