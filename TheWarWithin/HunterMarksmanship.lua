@@ -1,7 +1,5 @@
 -- HunterMarksmanship.lua
--- July 2024
-
--- TOPDO: Lunar Storm ICD
+-- October 2024 big updates for 11.0.5
 
 if UnitClassBase( "player" ) ~= "HUNTER" then return end
 
@@ -1205,6 +1203,7 @@ spec:RegisterAbilities( {
         spendType = "focus",
 
         talent = "kill_shot",
+        notalent = "black_arrow",
         startsCombat = true,
 
         usable = function () return buff.deathblow.up or buff.flayers_mark.up or target.health_pct < 20, "requires flayers_mark or target health below 20 percent" end,
