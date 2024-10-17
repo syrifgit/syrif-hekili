@@ -1791,17 +1791,11 @@ spec:RegisterAbilities( {
     explosive_shot = {
         id = 212431,
         cast = 0,
-        cooldown = function()
-            if buff.bombardier.up then return 0 end
-            return 30
-        end,
+        cooldown = 30,
         gcd = "spell",
         school = "fire",
 
-        spend = function()
-            if buff.bombardier.up then return 0 end
-            return 20
-        end,
+        spend = 20,
         spendType = "focus",
 
         talent = "explosive_shot",
