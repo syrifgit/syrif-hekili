@@ -1216,7 +1216,7 @@ spec:RegisterAbilities( {
         talent = "fel_devastation",
         startsCombat = true,
         texture = 1450143,
-        nobuff = function () return talent.demonic_intensity.enabled and "metamorphosis" or nil end,
+        nobuff = "demonsurge_hardcast",
 
         start = function ()
             applyBuff( "fel_devastation" )
@@ -1253,24 +1253,14 @@ spec:RegisterAbilities( {
         buff = "demonsurge_hardcast",
 
         start = function ()
-            applyBuff( "fel_devastation" )
-
             if buff.demonsurge_fel_desolation.up then
                 removeBuff( "demonsurge_fel_desolation" )
                 if talent.demonic_intensity.enabled then addStack( "demonsurge" ) end
             end
-
-            if talent.demonic.enabled then TriggerDemonic() end
+            spec.abilities.fel_devastation.start()
         end,
 
-        finish = function ()
-
-            if talent.darkglare_boon.enabled then
-                gain( 15, "fury" )
-                reduceCooldown( "fel_devastation", 6 )
-            end
-            if talent.ruinous_bulwark.enabled then applyBuff( "ruinous_bulwark" ) end
-        end,
+        finish = function () spec.abilities.fel_devastation.finish() end,
 
         bind = "fel_devastation"
     },
@@ -1598,7 +1588,7 @@ spec:RegisterAbilities( {
 
         startsCombat = false,
         texture = 1344652,
-        nobuff = function () return talent.demonic_intensity.enabled and "metamorphosis" or nil end,
+        nobuff = "demonsurge_hardcast",
 
         readyTime = function ()
             return sigils.flame - query_time
@@ -1781,7 +1771,7 @@ spec:RegisterAbilities( {
 
         startsCombat = true,
         texture = 1344653,
-        nobuff = function () return talent.demonsurge.enabled and "metamorphosis" or nil end,
+        nobuff = "demonsurge_demonic",
 
         handler = function ()
             removeBuff( "soul_furnace" )
@@ -1819,10 +1809,9 @@ spec:RegisterAbilities( {
         startsCombat = true,
         texture = 1355117,
         talent = "demonsurge",
-        buff = "metamorphosis",
+        buff = "demonsurge_demonic",
 
         handler = function ()
-
             if buff.demonsurge_soul_sunder.up then
                 removeBuff( "demonsurge_soul_sunder" )
                 if talent.demonic_intensity.enabled then addStack( "demonsurge" ) end
@@ -1862,7 +1851,7 @@ spec:RegisterAbilities( {
         talent = "spirit_bomb",
         startsCombat = false,
         buff = "soul_fragments",
-        nobuff = function () return talent.demonsurge.enabled and "metamorphosis" or nil end,
+        nobuff = "demonsurge_demonic",
 
         handler = function ()
 
@@ -1888,9 +1877,9 @@ spec:RegisterAbilities( {
         spend = 40,
         spendType = "fury",
 
-        talent = function() return talent.spirit_bomb.enabled and "demonsurge" or "spirit_bomb" end,
+        talent = "demonsurge",
         startsCombat = false,
-        buff = function () return buff.metamorphosis.down and "metamorphosis" or "soul_fragments" end,
+        usable = function () return buff.demonsurge_demonic.up and buff.soul_fragments.up end,
 
         handler = function ()
             if buff.demonsurge_spirit_burst.up then
