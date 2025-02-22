@@ -998,20 +998,55 @@ end, state )
 
 local sigilList = { "sigil_of_Flame", "sigil_of_misery", "sigil_of_spite", "sigil_of_silence", "sigil_of_chains", "sigil_of_doom" }
 
+local extendBuff = setfenv( function( aura, seconds )
+    local b = state.buff[ aura ]
+    if not ( b and b.up ) then return end
+
+    seconds = seconds or 0
+    if seconds == 0 then return end
+
+    b.duration = b.duration + seconds
+    b.expires = b.expires + seconds
+end, state )
+
 local TriggerDemonic = setfenv( function()
     if buff.metamorphosis.up then
-        buff.metamorphosis.expires = buff.metamorphosis.expires + 7
-        if talent.demonic_intensity.enabled and buff.demonsurge_hardcast.up then buff.demonsurge_hardcast.expires = buff.metamorphosis.expires end
+        local seconds = 7
+        extendBuff( "metamorphosis", seconds )
+
+        -- Fel-Scarred
+        if talent.demonsurge.enabled and buff.demonsurge_demonic.up then
+            local remains = buff.metamorphosis.remains
+
+            extendBuff( "demonsurge_demonic", seconds )
+            if buff.demonsurge_spirit_burst.up then
+                extendBuff( "demonsurge_spirit_burst", seconds )
+            else
+                applyBuff( "demonsurge_spirit_burst", remains )
+            end
+            if buff.demonsurge_soul_sunder.up then
+                extendBuff( "demonsurge_soul_sunder", seconds )
+            else
+                applyBuff( "demonsurge_soul_sunder", remains )
+            end
+            if talent.demonic_intensity.enabled and buff.demonsurge_hardcast.up then
+                extendBuff( "demonsurge_hardcast", seconds )
+                extendBuff( "demonsurge_fel_desolation", seconds )
+                extendBuff( "demonsurge_consuming_fire", seconds )
+                extendBuff( "demonsurge_sigil_of_doom", seconds )
+            end
+        end
     else
         applyBuff( "metamorphosis", 7 )
-        if talent.inner_demon.enabled then
-            applyBuff( "inner_demon" )
-        end
+        if talent.inner_demon.enabled then applyBuff( "inner_demon" ) end
         stat.haste = stat.haste + 10
+
         -- Fel-Scarred
         if talent.demonsurge.enabled then
-            applyBuff( "demonsurge_spirit_burst", buff.metamorphosis.remains )
-            applyBuff( "demonsurge_soul_sunder", buff.metamorphosis.remains )
+            local remains = buff.metamorphosis.remains
+            applyBuff( "demonsurge_demonic", remains )
+            applyBuff( "demonsurge_spirit_burst", remains )
+            applyBuff( "demonsurge_soul_sunder", remains )
         end
     end
 end, state )
