@@ -1476,28 +1476,37 @@ spec:RegisterAbilities( {
         toggle = "cooldowns",
 
         handler = function ()
-
-            applyBuff( "metamorphosis", buff.metamorphosis.remains + 15 )
+            if buff.metamorphosis.up then
+                extendBuff( "metamorphosis", 15 )
+            else
+                applyBuff( "metamorphosis", 15 )
+            end
             gain( health.max * 0.4, "health" )
 
             if talent.demonsurge.enabled then
-                applyBuff( "demonsurge_soul_cleave", buff.metamorphosis.remains )
-                applyBuff( "demonsurge_spirit_bomb", buff.metamorphosis.remains )
+                local remains = buff.metamorphosis.remains
+
+                applyBuff( "demonsurge_demonic", remains )
+                applyBuff( "demonsurge_soul_cleave", remains )
+                applyBuff( "demonsurge_spirit_bomb", remains )
+
                 if talent.violent_transformation.enabled then
                     setCooldown( "sigil_of_flame", 0 )
                     setCooldown( "fel_devastation", 0 )
-                    setCooldown( "sigil_of_doom", 0 )
-                    setCooldown( "fel_desolation", 0 )
                 end
+
                 if talent.demonic_intensity.enabled then
-                    applyBuff( "demonsurge_hardcast", buff.metamorphosis.remains )
-                    applyBuff( "demonsurge_consuming_fire", buff.metamorphosis.remains )
-                    applyBuff( "demonsurge_fel_desolation", buff.metamorphosis.remains )
-                    applyBuff( "demonsurge_sigil_of_doom", buff.metamorphosis.remains )
+                    applyBuff( "demonsurge_hardcast", remains )
+                    applyBuff( "demonsurge_consuming_fire", remains )
+                    applyBuff( "demonsurge_fel_desolation", remains )
+                    applyBuff( "demonsurge_sigil_of_doom", remains )
+
+                    if talent.violent_transformation.enabled then
+                        setCooldown( "sigil_of_doom", 0 )
+                        setCooldown( "fel_desolation", 0 )
+                    end
                 end
             end
-
-
 
             -- last_metamorphosis = query_time
         end,
