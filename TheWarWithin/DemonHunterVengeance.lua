@@ -1539,7 +1539,7 @@ spec:RegisterAbilities( {
             if buff.rending_strike.up then -- Reaver stuff
                 applyDebuff( "target", "reavers_mark" )
                 removeBuff( "rending_strike" )
-                if buff.glaive_flurry.down then applyBuff( "thrill_of_the_fight" ) end
+                if talent.thrill_of_the_fight.enabled and buff.glaive_flurry.down then applyBuff( "thrill_of_the_fight" ) end
             end
 
             -- Legacy
@@ -1776,10 +1776,9 @@ spec:RegisterAbilities( {
         handler = function ()
             removeBuff( "soul_furnace" )
 
-            -- 
             if buff.glaive_flurry.up then -- Reaver stuff
                 removeBuff( "glaive_flurry" )
-                if buff.rending_strike.down then applyBuff( "thrill_of_the_fight" ) end
+                if talent.thrill_of_the_fight.enabled and buff.rending_strike.down then applyBuff( "thrill_of_the_fight" ) end
             end
 
             if talent.feast_of_souls.enabled then applyBuff( "feast_of_souls" ) end
