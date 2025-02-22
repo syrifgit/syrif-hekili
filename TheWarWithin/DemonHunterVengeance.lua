@@ -12,8 +12,6 @@ local class, state = Hekili.Class, Hekili.State
 local floor = math.floor
 local strformat = string.format
 
-local CanTriggerDemonsurge = IsSpellOverlayed
-
 local spec = Hekili:NewSpecialization( 581 )
 
 spec:RegisterResource( Enum.PowerType.Fury, {
@@ -797,17 +795,26 @@ spec:RegisterHook( "reset_precast", function ()
     -- SpellOverlay API call is 1:1 with "can trigger a demonsurge damage proc", this grounds these fake buffs in the gamestate
     -- demonsurge_hardcast differentiates whether only the basic 2 abilities are transformed, or all 5
     if talent.demonsurge.enabled and buff.metamorphosis.up then
-        if CanTriggerDemonsurge( 452436 ) then applyBuff( "demonsurge_soul_sunder", buff.metamorphosis.remains ) end
-        if CanTriggerDemonsurge( 452437 ) then applyBuff( "demonsurge_spirit_burst", buff.metamorphosis.remains ) end
+        local CanTriggerDemonsurge = IsSpellOverlayed
+
+        local applied = buff.metamorphosis.applied
+        local remains = buff.metamorphosis.remains
+
+        local hardcast = talent.demonic_intensity.enabled and ( action.metamorphosis.lastCast >= applied or action.fel_desolation.lastCast >= applied )
+        local demonic = talent.demonic.enabled and action.fel_devastation.lastCast >= applied
+
+        if hardcast or demonic then applyBuff( "demonsurge_demonic", remains ) end
+        if CanTriggerDemonsurge( 452436 ) then applyBuff( "demonsurge_soul_sunder", remains ) end
+        if CanTriggerDemonsurge( 452437 ) then applyBuff( "demonsurge_spirit_burst", remains ) end
+
         if talent.demonic_intensity.enabled then
-            if ( action.metamorphosis.lastCast >= buff.metamorphosis.applied ) or ( buff.metamorphosis.expires > ( action.metamorphosis.lastCast + 15 ) ) then
-                applyBuff( "demonsurge_hardcast", buff.metamorphosis.remains )
-            end
-            if CanTriggerDemonsurge( 452486 ) then applyBuff( "demonsurge_fel_desolation", buff.metamorphosis.remains ) end
-            if CanTriggerDemonsurge( 452487 ) then applyBuff( "demonsurge_consuming_fire", buff.metamorphosis.remains ) end
-            if CanTriggerDemonsurge( 452490 ) then applyBuff( "demonsurge_sigil_of_doom", buff.metamorphosis.remains ) end
-            -- setCooldown( "fel_devastation", max( cooldown.fel_devastation.remains, cooldown.fel_desolation.remains, buff.metamorphosis.remains ) ) -- To support cooldown.eye_beam.up checks in SimC priority.
+            if hardcast then applyBuff( "demonsurge_hardcast", remains ) end
+            if CanTriggerDemonsurge( 452486 ) then applyBuff( "demonsurge_fel_desolation", remains ) end
+            if CanTriggerDemonsurge( 452487 ) then applyBuff( "demonsurge_consuming_fire", remains ) end
+            if CanTriggerDemonsurge( 452490 ) then applyBuff( "demonsurge_sigil_of_doom", remains ) end
+            -- setCooldown( "fel_devastation", max( cooldown.fel_devastation.remains, cooldown.fel_desolation.remains, remains ) ) -- To support cooldown.eye_beam.up checks in SimC priority.
         end
+
         if Hekili.ActiveDebug then
             Hekili:Debug( "Demon Surge status:\n" ..
                 " - Hardcast " .. ( buff.demonsurge_hardcast.up and "ACTIVE" or "INACTIVE" ) .. "\n" ..
