@@ -1414,43 +1414,8 @@ spec:RegisterAbilities( {
             end
         end,
 
-        bind = "consuming_fire",
+        copy = "consuming_fire",
     },
-
-    --[[consuming_fire = {
-        id = 452487,
-        known = 258920,
-        cast = 0,
-        cooldown = 15,
-        hasteCD = true,
-        gcd = "spell",
-        school = "fire",
-        texture = 135794,
-
-        spend = -8,
-        spendType = "fury",
-        startsCombat = true,
-        talent = "demonic_intensity",
-        buff = "demonsurge_hardcast",
-
-        handler = function ()
-            applyBuff( "immolation_aura" )
-            if legendary.fel_flame_fortification.enabled then applyBuff( "fel_flame_fortification" ) end
-            if pvptalent.cleansed_by_flame.enabled then
-                removeDebuff( "player", "reversible_magic" )
-            end
-
-            if talent.fallout.enabled then
-                addStack( "soul_fragments", nil, active_enemies < 3 and 1 or 2 )
-            end
-            if buff.demonsurge_consuming_fire.up then
-                removeBuff( "demonsurge_consuming_fire" )
-                if talent.demonic_intensity.enabled then addStack( "demonsurge" ) end
-            end
-        end,
-
-        bind = "immolation_aura",
-    },--]]
 
     -- Talent: Imprisons a demon, beast, or humanoid, incapacitating them for $d. Damage will cancel the effect. Limit 1.
     imprison = {
