@@ -269,8 +269,9 @@ spec:RegisterAuras( {
     },
     -- Fake buffs for demonsurge damage procs
     demonsurge_consuming_fire = {},
+    demonsurge_demonic = { id = 452435 },
     demonsurge_fel_desolation = {},
-    demonsurge_hardcast = {},
+    demonsurge_hardcast = { id = 452489 },
     demonsurge_sigil_of_doom = {},
     demonsurge_soul_sunder = {},
     demonsurge_spirit_burst = {},
@@ -374,8 +375,6 @@ spec:RegisterAuras( {
         id = 187827,
         duration = 15,
         max_stack = 1,
-        -- This copy is for SIMC compatability while avoiding managing a virtual buff
-        copy = function() if state.talent.demonsurge.enabled then return "demonsurge_demonic" end end,
     },
     -- Stunned.
     -- https://wowhead.com/beta/spell=200166
